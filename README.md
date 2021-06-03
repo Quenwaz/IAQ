@@ -1,2 +1,6 @@
 # IAQ
-Solve interesting algorithmic questions.
+收集与解决感兴趣的算法题。
+
+# 更新列表
+- [x] 字符串转浮点数
+
