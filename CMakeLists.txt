@@ -24,13 +24,19 @@ if (IAQ_BUILD_TESTS)
     include(CTest)
     find_package(GTest QUIET)
     if (NOT GTEST_FOUND)
-    message("GoogleTest not found. Consider installing it on your system. Downloading it from source...")
-    include(FetchContent)
+        message("GoogleTest not found. Consider installing it on your system. Downloading it from source...")
+        include(FetchContent)
+        set(FETCHCONTENT_QUIET OFF)
+        # 设置依赖目录
+        get_filename_component(deps "../deps" REALPATH BASE_DIR "${CMAKE_BINARY_DIR}")
+        set(FETCHCONTENT_BASE_DIR ${deps})
         FetchContent_Declare(
             googletest
             GIT_REPOSITORY https://github.com/google/googletest.git
+            # GIT_TAG release-1.10.0
             GIT_SHALLOW true
         )
+         
         set(BUILD_GMOCK OFF CACHE BOOL "")
         FetchContent_GetProperties(googletest)
         if(NOT googletest_POPULATED)

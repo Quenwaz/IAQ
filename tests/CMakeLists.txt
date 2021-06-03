@@ -15,4 +15,21 @@ function(iaq_test test_name)
 endfunction()
 
 
-iaq_test(str2float_test)
+
+
+macro(subdirlist result curdir)
+    file(GLOB children RELATIVE ${curdir} ${curdir}/*.cpp)
+    set(dirlist "")
+    foreach(child ${children})
+        if(NOT IS_DIRECTORY ${curdir}/${child})
+            STRING(REGEX REPLACE "(.*)\.cpp" "\\1" FILE_NAME ${child})
+            list(APPEND dirlist ${FILE_NAME})
+        endif()
+    endforeach(child ${children})
+    set(${result} ${dirlist})
+endmacro(subdirlist result curdir)
+
+subdirlist(tests ${CMAKE_CURRENT_SOURCE_DIR})
+foreach(test ${tests})
+    iaq_test(${test})
+endforeach(test ${tests})

@@ -4,7 +4,7 @@
 
 namespace solve
 {
-    float str_to_float(const char* pszInput, size_t validbit = 3);
+    double str_to_float(const char* pszInput, size_t validbit = 3);
 }
 
 
