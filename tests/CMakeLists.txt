@@ -11,6 +11,7 @@ function(iaq_test test_name)
     else ()
         target_link_libraries(${TEST_EXECUTABLE} GTest::GTest GTest::Main ${PROJECT_NAME}_static)
     endif ()
+    target_compile_definitions(${TEST_EXECUTABLE} PRIVATE _GLIBCXX_USE_CXX11_ABI=0)
     add_test(${test_name} ${TEST_EXECUTABLE})
 endfunction()
 
