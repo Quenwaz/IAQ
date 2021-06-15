@@ -4,7 +4,7 @@
 
 namespace __internal{
 
-std::vector<int> two_sum_v1(std::vector<int>& nums, int target)
+std::vector<int> two_sum_v1(const std::vector<int>& nums, int target)
 {
     std::vector<int> result;
     result.reserve(2);
@@ -26,7 +26,7 @@ std::vector<int> two_sum_v1(std::vector<int>& nums, int target)
     return result;
 }
 
-std::vector<int> two_sum_v2(std::vector<int>& nums, int target)
+std::vector<int> two_sum_v2(const std::vector<int>& nums, int target)
 {
     std::map<int,size_t> mapnums;
     std::vector<int> result;
@@ -46,7 +46,7 @@ std::vector<int> two_sum_v2(std::vector<int>& nums, int target)
     return result;
 }
 
-std::vector<int> two_sum_v3(std::vector<int>& nums, int target)
+std::vector<int> two_sum_v3(const std::vector<int>& nums, int target)
 {
     std::map<int,size_t> mapnums;
     std::vector<int> result;
@@ -69,8 +69,12 @@ std::vector<int> two_sum_v3(std::vector<int>& nums, int target)
 }
 
 
-std::vector<int> solve::two_sum::operator()(std::vector<int>& nums, int target)
+std::vector<int> solve::two_sum::operator()(const std::vector<int>& nums, int target)
 {
+    if(nums.size() < 2){
+        return {};
+    }
+
     switch (this->version_)
     {
     case iaq::V2: return __internal::two_sum_v2(nums, target);

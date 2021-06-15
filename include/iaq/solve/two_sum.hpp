@@ -17,7 +17,7 @@ namespace solve
             return iaq::Version::V3;
         }
 
-        std::vector<int> operator()(std::vector<int>& nums, int target);
+        std::vector<int> operator()(const std::vector<int>& nums, int target);
     };
 
 }

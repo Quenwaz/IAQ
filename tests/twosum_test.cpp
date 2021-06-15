@@ -3,8 +3,12 @@
 #include "iaq/iaq.hpp"
 
 
+TEST(twosum, input)
+{
+    ASSERT_EQ(solve::two_sum()(std::vector<int>(), 5), std::vector<int>());
+}
 
-TEST(two_sum, t1)
+TEST(twosum, t1)
 {
     std::vector<int> input{1, 3, 2};
     std::vector<int> output{0, 2};
@@ -16,7 +20,7 @@ TEST(two_sum, t1)
     ASSERT_EQ(output, two_sum(input, 3));
 }
 
-TEST(two_sum, t2)
+TEST(twosum, t2)
 {
     std::vector<int> input{0,1,-1,5,2,8,3,4,9};
     const std::vector<int> output1{0, 6};
@@ -31,7 +35,7 @@ TEST(two_sum, t2)
 }
 
 
-TEST(two_sum, t4)
+TEST(twosum, t4)
 {
     std::vector<int> input{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     std::vector<int> output{1, 9};
