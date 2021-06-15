@@ -1,6 +1,6 @@
-#include "iaq/str2float.hpp"
+#include "iaq/solve/str2float.hpp"
 
-double solve::str_to_float(const char* pszInput, size_t validbit/* = 3*/)
+double solve::str_to_float::operator()(const char* pszInput, size_t validbit/* = 3*/)
 {
     if (pszInput == NULL){
         return 0;
