@@ -15,7 +15,7 @@
 # 已解决问题
 
 1. [字符串转浮点数](IAQ/str2float/README.md)
-2. [两数之和](IAQ/two_sum/README.md)
+2. [两数之和](IAQ/twosum/README.md)
 
 
 # 待解决问题
