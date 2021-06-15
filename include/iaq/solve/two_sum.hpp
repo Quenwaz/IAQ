@@ -1,3 +1,13 @@
+/**
+ * @file twosum.cpp
+ * @author Quenwaz (404937333@qq.com)
+ * @brief 两数之和
+ * @version 0.1
+ * @date 2021-06-15
+ * 
+ * @copyright Copyright (c) 2021 Quenwaz
+ * 
+ */
 #ifndef _h_two_sum_included__
 #define _h_two_sum_included__
 #include "iaq/iaq_defs.hpp"
