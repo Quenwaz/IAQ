@@ -15,9 +15,9 @@
 
 namespace solve
 {
-    struct str_to_float : public iaq::AlgBase
+    struct StrToFloat : public iaq::AlgBase
     {
-        explicit str_to_float(iaq::Version ver=iaq::Version::V1)
+        explicit StrToFloat(iaq::Version ver=iaq::Version::V1)
         : iaq::AlgBase(ver) 
         {
         }
@@ -27,7 +27,7 @@ namespace solve
             return iaq::Version::V1;
         }
 
-        double operator()(const char* pszInput, size_t validbit = 3);
+        double operator()(const char* pszInput, size_t validbit = 3) const;
     };
 }
 

@@ -14,9 +14,9 @@
 
 namespace solve
 {
-    struct two_sum : public iaq::AlgBase
+    struct TwoSum : public iaq::AlgBase
     {
-        explicit two_sum(iaq::Version ver=iaq::Version::V1)
+        explicit TwoSum(iaq::Version ver=iaq::Version::V1)
         : iaq::AlgBase(ver)
         {
 
@@ -27,7 +27,7 @@ namespace solve
             return iaq::Version::V3;
         }
 
-        std::vector<int> operator()(const std::vector<int>& nums, int target);
+        std::vector<int> operator()(const std::vector<int>& nums, int target)  const;
     };
 
 }

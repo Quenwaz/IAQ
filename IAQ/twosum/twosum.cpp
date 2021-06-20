@@ -69,7 +69,7 @@ std::vector<int> two_sum_v3(const std::vector<int>& nums, int target)
 }
 
 
-std::vector<int> solve::two_sum::operator()(const std::vector<int>& nums, int target)
+std::vector<int> solve::TwoSum::operator()(const std::vector<int>& nums, int target)  const
 {
     if(nums.size() < 2){
         return {};
