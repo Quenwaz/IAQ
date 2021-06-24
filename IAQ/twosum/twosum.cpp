@@ -1,6 +1,7 @@
 #include <vector>
 #include <map>
 #include "iaq/solve/two_sum.hpp"
+using namespace iaq;
 
 namespace __internal{
 

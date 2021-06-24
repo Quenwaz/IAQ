@@ -1,6 +1,8 @@
 
 #include "iaq/solve/add_two_numbers.hpp"
 
+using namespace iaq;
+
 solve::AddTwoNumbers::List::List()
     : root_(nullptr), curpos_(nullptr)
 {

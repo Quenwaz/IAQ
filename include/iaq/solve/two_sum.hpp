@@ -12,7 +12,7 @@
 #define _h_two_sum_included__
 #include "iaq/iaq_defs.hpp"
 
-namespace solve
+namespace iaq::solve
 {
     struct TwoSum : public iaq::AlgBase
     {

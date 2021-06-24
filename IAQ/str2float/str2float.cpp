@@ -1,4 +1,5 @@
 #include "iaq/solve/str2float.hpp"
+using namespace iaq;
 
 double solve::StrToFloat::operator()(const char* pszInput, size_t validbit/* = 3*/)  const
 {

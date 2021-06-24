@@ -13,7 +13,7 @@
 #include "iaq/iaq_defs.hpp"
 #include <stddef.h>
 
-namespace solve
+namespace iaq::solve
 {
     struct StrToFloat : public iaq::AlgBase
     {

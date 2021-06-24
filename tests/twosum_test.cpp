@@ -2,6 +2,7 @@
 #include <vector>
 #include "iaq/iaq.hpp"
 
+using namespace iaq;
 
 TEST(twosum, input)
 {

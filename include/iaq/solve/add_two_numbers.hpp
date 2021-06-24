@@ -13,7 +13,7 @@
 #include "iaq/iaq_defs.hpp"
 
 
-namespace solve
+namespace iaq::solve
 {
     struct AddTwoNumbers : public iaq::AlgBase
     {

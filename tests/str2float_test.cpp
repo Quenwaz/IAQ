@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "iaq/iaq.hpp"
 
+using namespace iaq;
 
 TEST(str2float, border_check)
 {
