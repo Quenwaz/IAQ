@@ -18,7 +18,7 @@
 1. [字符串转浮点数](IAQ/str2float/README.md)
 2. [两数之和](IAQ/twosum/README.md)
 3. [两数相加](IAQ/add_two_numbers/README.md)
-4. [十六进制转换](IAQ)
+4. [十六进制转换](IAQ/hexadecimal_convertion/README.md)
 
 
 # 待解决问题
