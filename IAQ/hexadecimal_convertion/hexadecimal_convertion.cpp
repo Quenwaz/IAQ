@@ -9,7 +9,7 @@ size_t iaq::solve::HexConv::operator()(const unsigned char* bytes, size_t nbyte,
     }
 
     if (hexstr == nullptr){
-        return nbyte * 2 + 1;
+        return (nbyte << 1) + 1;
     }
 
     for (size_t i =0;i < nbyte; ++i)
@@ -21,7 +21,7 @@ size_t iaq::solve::HexConv::operator()(const unsigned char* bytes, size_t nbyte,
         hexstr[(i<<1) + 1] =   char2hex(remainder);
 #undef char2hex
     }
-    return nbyte * 2;
+    return nbyte << 1;
 }
 
 size_t iaq::solve::HexConv::operator()(const char* hexstr, size_t nstr, unsigned char* bytes) const
