@@ -1,6 +1,38 @@
-#include <stddef.h>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
 #include "iaq/solve/hexadecimal_conversion.hpp"
 
+
+iaq::solve::HexConv::ByteOrder iaq::solve::HexConv::CurrentByteOrder() const
+{
+    union{
+        char byte;
+        int integer;
+    }un;
+
+    un.integer = 0x12345678;
+    if (un.byte == 0x12){
+        return kBigEndian;
+    }else if (un.byte == 0x78){
+        return kLittleEndian;
+    }
+}
+
+unsigned char * iaq::solve::HexConv::reverse(unsigned char * bytes, size_t nbyte) const
+{
+    for (size_t i =0;i < nbyte; ++i)
+    {
+        const size_t idx_last = nbyte - i - 1;
+        if (idx_last <= i){
+            break;
+        }
+        unsigned char tmp= bytes[i];
+        bytes[i] = bytes[idx_last];
+        bytes[idx_last] = tmp;
+    }
+    return bytes;
+}
 
 size_t iaq::solve::HexConv::operator()(const unsigned char* bytes, size_t nbyte, char* hexstr, bool toupper /*= true*/) const
 {
@@ -22,6 +54,36 @@ size_t iaq::solve::HexConv::operator()(const unsigned char* bytes, size_t nbyte,
 #undef char2hex
     }
     return nbyte << 1;
+}
+
+size_t iaq::solve::HexConv::operator()(intptr_t data, char* hexstr, bool toupper) const
+{
+    const size_t nbytes = sizeof(intptr_t);
+    if (hexstr == nullptr){
+        return (nbytes << 1) + 1;
+    }
+
+    unsigned char bytes[nbytes]={0};
+    memcpy(bytes, &data, nbytes);
+
+    if (CurrentByteOrder() == kLittleEndian)
+    {
+        this->reverse(bytes, sizeof(bytes));
+    }
+    return this->operator()(bytes, nbytes, hexstr, toupper);
+}
+
+size_t iaq::solve::HexConv::operator()(const char* hexstr, size_t nstr, intptr_t& data) const
+{
+    unsigned char bytes[sizeof(intptr_t)]={0};
+    const size_t ret = this->operator()(hexstr, nstr, bytes);
+    if (CurrentByteOrder() == kLittleEndian)
+    {
+        this->reverse(bytes, sizeof(bytes));
+    }
+
+    memcpy(&data, bytes, sizeof(intptr_t));
+    return ret;
 }
 
 size_t iaq::solve::HexConv::operator()(const char* hexstr, size_t nstr, unsigned char* bytes) const
