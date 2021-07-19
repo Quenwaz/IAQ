@@ -20,11 +20,11 @@ TEST(HexConvTest, t1)
 
     char o3[(sizeof(intptr_t) << 1) + 1]={0};
     iaq::solve::HexConv()(12345, o3);
-    ASSERT_STREQ(o3, "0000000000003039");
+    ASSERT_STREQ(o3, sizeof(intptr_t) ==8 ?"0000000000003039":"00003039");
 
 
     intptr_t data = 0;
-    iaq::solve::HexConv()(o3, 16, data);
+    iaq::solve::HexConv()(o3, sizeof(intptr_t) << 1, data);
     ASSERT_EQ(data, 12345);
 
   
