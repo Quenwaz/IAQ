@@ -9,6 +9,16 @@ namespace iaq::solve::base64
     /// Base64基础字符
     const char kBase64Char[]="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
+    /**
+     * @brief 根据字符获取其索引
+     * 
+     * @param ch 字符
+     * @return uint8_t 索引
+     * @note 依赖kBase64Char变量的定义
+     */
+    uint8_t base64_char_index(char ch);
+
+
     struct Encode : public iaq::AlgBase
     {
         explicit Encode(iaq::Version ver = iaq::Version::V1)
@@ -31,7 +41,7 @@ namespace iaq::solve::base64
          * @return size_t 返回Base64字符串长度
          * @note 当base64str为nullptr时， 返回其所需数组长度
          */
-        size_t operator()(const unsigned char* bytes, size_t nbyte, char* base64str) const;
+        size_t operator()(const unsigned char* bytes, size_t nbyte, char* base64str, bool safe = false) const;
     };
 
 
