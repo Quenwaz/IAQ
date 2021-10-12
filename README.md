@@ -8,6 +8,7 @@
 - [x] 十六进制转换
 - [x] Base64转换
 - [x] Unicode转换
+- [x] 字节对齐
 
 # 目录
 - [IAQ](#iaq)
@@ -25,6 +26,7 @@
 4. [十六进制转换](IAQ/hexadecimal_convertion/README.md)
 5. [Base64转换](IAQ/base64/README.md)
 6. [Unicode转换](IAQ/unicode/README.md)
+7. [字节对齐](IAQ/byte_alignment/README.md)
 
 
 # 待解决问题
