@@ -28,6 +28,8 @@ struct Struct6{
 ```
 
 其真实地址结构如下:
+
+```
 ---- 
 |  |
 ---- 0x18 > doubletype
@@ -39,26 +41,66 @@ struct Struct6{
 ---- 0x04 > integer
 |  |
 ---- 0x00 > ch
+```
 
 对齐大致如下:
+
+```
 [x] [x] [x] [x] [x] [x] [x] [x]   doubletype
 [x] [x] [ ] [ ] [ ] [ ] [ ] [ ]   point 2byte
 [x] [x] [x] [x] [x] [x] [x] [x]   shorttype & point 6byte
 [x] [ ] [ ] [ ] [x] [x] [x] [x]   ch & integer
+```
 
 
 ## 编译指令修改对齐规则
+
+### #pragma pack(N)
+用于修改系统对齐值，也称指定对齐值。N取值为1、2、4、8，大于8则以8为对齐值。惯用法如下:
+```c
+#pragma pack(2)
+// 作用于当前代码块
+#pragma pack()
+```
+
+`#pragma pack()`用于取消指定对齐，按照编译器的优化对齐方式对齐
+
+### __attribute__((aligned(N)))
+让所作用的结构体、类的成员对齐在N字节自然边界上,如果结构中有成员的长度大于N，则按照机器字长来对齐。n=1,2,4,8,16…
+如:
+```c
+struct Test{
+    char ch;
+    int integer;
+}__attribute__ ((aligned(2)));
+```
+x64的CPU下机器字长为8byte, 而指定的对齐字节为2byte, 小于成员最大自然对齐字节integer。所以取机器字长8byte作为有效对齐值。
+
+
+### __attribute__ ((packed))
+取消结构在编译过程中的优化对齐。按照实际占用字节数进行对齐，是gcc编译器特有的语法。
+
+如:
+```c
+struct Test{
+    char ch;
+    int integer;
+};
+```
+
+其中sizeof(integer) == 4, 而sizeof(Test) == 8; 如果取消优化对齐：
+```c
+struct Test{
+    char ch;
+    int integer;
+}__attribute__ ((packed));
+```
+sizeof(integer) == 4, 而sizeof(Test) == 5。
 
 
 ## 术语
 - 机器字长： 即CPU一次能处理数据的位数。 也称系统对齐值。 
 - 自然边界: 也称自身对齐值， 与自身数据类型大小的值一样
 - 指定对齐值: 即修改后的机器字长
-- 结构体整体对齐:
-- 有效对齐值:
-
-## 参考链接
-https://blog.51cto.com/u_9291927/1790295
-https://blog.csdn.net/cclethe/article/details/79659590
-https://blog.csdn.net/piaoliangjinjin/article/details/82971746
-https://www.pianshen.com/article/9169436305/
+- 结构体整体对齐: 当所有成员对齐后， 最后一个成员所占内存后的地址， 必须为有效对齐值的整数倍。 否则填充。
+- 有效对齐值: 适合以上规则后的对齐值
