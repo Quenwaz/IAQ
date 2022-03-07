@@ -27,5 +27,9 @@ TEST(HexConvTest, t1)
     iaq::solve::HexConv()(o3, sizeof(intptr_t) << 1, data);
     ASSERT_EQ(data, 12345);
 
-  
+    char hexname[]="433a5c55736572735c5175656e77617a5c4465736b746f705ce585b8e59e8be8aebee8aea142e6a8a1e59d97efbc88e68e92e7aea12de6b599e6b19fefbc89e4bfaee8aea2202d20436f70792e647767";
+    char name[81] = {0};
+    iaq::solve::HexConv()(hexname, 160, (unsigned char*)name);
+
+    int debug = 0;
 }
