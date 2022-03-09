@@ -1,6 +1,7 @@
 #include <queue>
 #include <set>
 #include <stack>
+#include <limits>
 #include <stdio.h>
 #include "iaq/solve/escape_the_maze.hpp"
 
@@ -70,7 +71,7 @@ namespace __internal{
 
         int dfs()
         {
-            int step = -1;
+            int step = std::numeric_limits<int>::max();
             int traversal_times = 0;
             std::stack<MazeIndex> stack_neb;
             get_neighbor(MazeIndex{1, 0, 0}, stack_neb);
@@ -78,13 +79,15 @@ namespace __internal{
             {
                 const auto top = stack_neb.top();
                 stack_neb.pop();
+                printf("walk: %d, %d\n", top.ridx, top.cidx);
                 get_neighbor(top, stack_neb);
                 if (top.cidx == (col_size_ - 1) && top.ridx == (row_size_ - 1))
                 {
-                    step = top.step;
-                    break;
+                    if (top.step < step)
+                        step = top.step;
                 }
                 ++traversal_times;
+                
             }
   
             printf("(%s)traversal_times:%d\n", __FUNCTION__, traversal_times);

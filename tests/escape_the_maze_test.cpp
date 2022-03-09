@@ -18,5 +18,22 @@ TEST(test_escape_the_maze, t1)
     
     ASSERT_EQ(iaq::solve::EscapeMaze()(maze, 9, 9), 17);
     ASSERT_EQ(iaq::solve::EscapeMaze(iaq::V2)(maze, 9, 9), 17);
+}
+
+TEST(test_escape_the_maze, t2)
+{
+    const char* maze[] = {
+        "111111110",
+        "100110110",
+        "111010100",
+        "001010111",
+        "111010001",
+        "100010111",
+        "110010100",
+        "011010100",
+        "001111111"
+    };
     
+    ASSERT_EQ(iaq::solve::EscapeMaze()(maze, 9, 9), 17);
+    ASSERT_EQ(iaq::solve::EscapeMaze(iaq::V2)(maze, 9, 9), 17);
 }
