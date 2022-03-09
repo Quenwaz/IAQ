@@ -16,7 +16,7 @@ TEST(test_escape_the_maze, t1)
         "011111111"
     };
     
-    auto step = iaq::solve::EscapeMaze()(maze, 9, 9);
-    ASSERT_EQ(step, 17);
+    ASSERT_EQ(iaq::solve::EscapeMaze()(maze, 9, 9), 17);
+    ASSERT_EQ(iaq::solve::EscapeMaze(iaq::V2)(maze, 9, 9), 17);
     
 }

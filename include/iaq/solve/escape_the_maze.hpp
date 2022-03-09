@@ -24,7 +24,7 @@ namespace iaq::solve
 
         iaq::Version GetSupportMaxVersion() const override
         {
-            return iaq::Version::V1;
+            return iaq::Version::V2;
         }
 
 
