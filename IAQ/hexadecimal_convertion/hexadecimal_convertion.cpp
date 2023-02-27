@@ -34,6 +34,28 @@ unsigned char * iaq::solve::HexConv::reverse(unsigned char * bytes, size_t nbyte
     return bytes;
 }
 
+        
+char* iaq::solve::HexConv::byte2hex(unsigned char byte, hexchar hex, bool toupper) const
+{
+        const unsigned char divisor = (byte >> 4);
+        const unsigned char remainder = byte & 0x0f;
+#define char2hex(ch)  ((ch) < 10 ? '0' + ch: (ch - 10) + ((toupper)?'A':'a'))
+        hex[0] = char2hex(divisor);
+        hex[1] =   char2hex(remainder);
+#undef char2hex
+    return hex;
+}
+
+unsigned char iaq::solve::HexConv::hex2byte(hexchar hex)const
+{
+#define hex2char(h)  (h > '9' ? ( h + 10 - (h >= 'a' ? 'a': 'A')) : (h - '0'))
+        const unsigned char c1 = hex2char(hex[0]) << 4;
+        const unsigned char c2 = hex2char(hex[1]);
+#undef hex2char
+
+        return c1 +  c2;
+}
+
 size_t iaq::solve::HexConv::operator()(const unsigned char* bytes, size_t nbyte, char* hexstr, bool toupper /*= true*/) const
 {
     if (bytes == nullptr || nbyte == 0){
@@ -46,12 +68,10 @@ size_t iaq::solve::HexConv::operator()(const unsigned char* bytes, size_t nbyte,
 
     for (size_t i =0;i < nbyte; ++i)
     {
-        const unsigned char divisor = (bytes[i] >> 4);
-        const unsigned char remainder = bytes[i] & 0x0f;
-#define char2hex(ch)  ((ch) < 10 ? '0' + ch: (ch - 10) + ((toupper)?'A':'a'))
-        hexstr[i<<1] = char2hex(divisor);
-        hexstr[(i<<1) + 1] =   char2hex(remainder);
-#undef char2hex
+        hexchar hexs={0, 0};
+        byte2hex(bytes[i], hexs, toupper);
+        hexstr[i<<1] = hexs[0];
+        hexstr[(i<<1) + 1] =   hexs[1];
     }
     return nbyte << 1;
 }
@@ -98,13 +118,8 @@ size_t iaq::solve::HexConv::operator()(const char* hexstr, size_t nstr, unsigned
 
     for (size_t i =0;i < nstr; i += 2)
     {
-        const char h1 = hexstr[i];
-        const char h2 = hexstr[i + 1];
-#define hex2char(h)  (h > '9' ? ( h + 10 - (h >= 'a' ? 'a': 'A')) : (h - '0'))
-        const unsigned char c1 = hex2char(h1) << 4;
-        const unsigned char c2 = hex2char(h2);
-#undef hex2char
-        bytes[i >> 1] = c1 +  c2;
+        hexchar hexs={hexstr[i], hexstr[i + 1]};
+        bytes[i >> 1] = hex2byte(hexs);
     }
     return (nstr >> 1);
 }

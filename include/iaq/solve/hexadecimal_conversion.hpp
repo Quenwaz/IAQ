@@ -39,6 +39,27 @@ namespace iaq::solve
          */
         unsigned char * reverse(unsigned char * bytes, size_t nbyte) const;
 
+        /// 十六进制2字节数组
+        typedef char hexchar[2] ;
+        
+        /**
+         * @brief 字节转换为十六进制
+         * 
+         * @param byte 字节
+         * @param hex [out] 十六进制
+         * @param toupper 是否输出大写十六进制
+         * @return char* 返回转换后的十六进制
+         */
+        char* byte2hex(unsigned char byte, hexchar hex, bool toupper) const;
+
+        /**
+         * @brief 十六进制转换为byte
+         * 
+         * @param hex 十六进制
+         * @return unsigned char byte
+         */
+        unsigned char hex2byte(hexchar hex)const;
+
         /**
          * @brief 字节转十六进制字符串
          * 
