@@ -27,5 +27,8 @@ TEST(HexConvTest, t1)
     iaq::solve::HexConv()(o3, sizeof(intptr_t) << 1, data);
     ASSERT_EQ(data, 12345);
 
-  
+    // const char* i1 = "";
+    // char o4[19]={0};
+    // iaq::solve::HexConv()((unsigned char*)i1, 9, o4, false);
+    // ASSERT_STREQ(o4, "e4b8ade69687");
 }
