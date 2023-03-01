@@ -23,6 +23,7 @@ add_subdirectory(IAQ)
 if (IAQ_BUILD_TESTS)
     include(CTest)
     find_package(GTest QUIET)
+    message(STATUS "CMAKE_BINARY_DIR=${CMAKE_BINARY_DIR}")
     if (NOT GTEST_FOUND)
         message("GoogleTest not found. Consider installing it on your system. Downloading it from source...")
         include(FetchContent)
@@ -32,7 +33,7 @@ if (IAQ_BUILD_TESTS)
         set(FETCHCONTENT_BASE_DIR ${deps})
         FetchContent_Declare(
             googletest
-            GIT_REPOSITORY https://github.com/google/googletest.git
+            GIT_REPOSITORY https://gitee.com/mirrors/googletest.git
             # GIT_TAG release-1.10.0
             GIT_SHALLOW true
         )

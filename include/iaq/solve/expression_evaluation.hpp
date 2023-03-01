@@ -13,7 +13,6 @@
 #define _h_expression_evaluation_included__
 #include "iaq/iaq_defs.hpp"
 
-
 namespace iaq::solve
 {
 struct ExpressionEvaluation : public iaq::AlgBase
@@ -28,7 +27,7 @@ struct ExpressionEvaluation : public iaq::AlgBase
         return iaq::Version::V1;
     }
 
-    double compute(const std::string& expression);
+    double compute(const char* expression);
 
 private:
     struct Impl;

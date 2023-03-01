@@ -4,17 +4,8 @@
 
 TEST(test_expression_evaluation, t1)
 {
-    const char* maze[] = {
-        "111101011",
-        "111100100",
-        "111111101",
-        "111101011",
-        "111111111",
-        "111111011",
-        "110111111",
-        "110111111",
-        "011111111"
-    };
-    
-    ASSERT_EQ(iaq::solve::ExpressionEvaluation().compute("(25+63)*2/67-19"), 17);
+    iaq::solve::ExpressionEvaluation exp_eval;
+    ASSERT_EQ(exp_eval.compute("12+ 2*3-6/2+sqrt(3*3)"), 18);
+    ASSERT_EQ(exp_eval.compute("9+(3-1)*3+8/2"), 19);
+    ASSERT_EQ(exp_eval.compute("5+6*2"), 17);
 }
