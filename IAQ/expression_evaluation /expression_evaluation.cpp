@@ -4,6 +4,7 @@
 #include <stack>
 #include <string>
 #include <vector>
+#include <stdexcept>
 
 using namespace iaq;
 
@@ -18,6 +19,17 @@ struct ExpressionItem {
   /// @brief 是否为操作数
   bool is_operand;
 };
+
+bool isdigit(const char* string)
+{
+  for (;*string != '\0';++string)
+  {
+    if (!std::isdigit(*string)){
+      return false;
+    }
+  }
+  return true;
+}
 
 void replace_all(std::string& base, const std::string& src,
                  const std::string& des) {
@@ -96,9 +108,12 @@ bool convert_to_postfix_expression(
         stack_of_operator.push(exp);
       } else {
         if (exp.value == ")") {
-          while (stack_of_operator.top().value != "(") {
+          while (!stack_of_operator.empty() && stack_of_operator.top().value != "(") {
             suffix_expression.push_back(stack_of_operator.top());
             stack_of_operator.pop();
+          }
+          if (stack_of_operator.empty() || stack_of_operator.top().value != "("){
+            return false;
           }
           stack_of_operator.pop();
 
@@ -120,6 +135,10 @@ bool convert_to_postfix_expression(
   }
 
   while (!stack_of_operator.empty()) {
+    auto & item = stack_of_operator.top();
+    if (item.value == "(" || item.value == ")"){
+      return false;
+    }
     suffix_expression.push_back(stack_of_operator.top());
     stack_of_operator.pop();
   }
@@ -130,15 +149,25 @@ bool convert_to_postfix_expression(
 struct solve::ExpressionEvaluation::Impl {};
 
 double solve::ExpressionEvaluation::compute(const char* expression) {
+
   std::string expstr(expression);
+  // replace all spaces
   replace_all(expstr, " ", "");
+
+  // replace all function names with short names
   replace_function_code(expstr);
+
+  // separates operands from operators
   std::vector<ExpressionItem> exps;
   splice_string(exps, expstr, "+-*/()^Ssct");
 
+  // converts an infix expression to a postfix expression
   std::vector<ExpressionItem> suffix_exps;
-  convert_to_postfix_expression(exps, suffix_exps);
+  if (exps.size() < 2 || !convert_to_postfix_expression(exps, suffix_exps)){
+    throw std::logic_error("expression syntax error");
+  }
 
+#ifdef _DEBUG
   expstr.clear();
   for (auto& item : suffix_exps)
   {
@@ -146,10 +175,14 @@ double solve::ExpressionEvaluation::compute(const char* expression) {
     // fflush(stdout);
     expstr += item.value;
   }
+#endif 
 
   std::stack<double> stack_of_operand;
   for (auto& item : suffix_exps) {
     if (item.is_operand) {
+      if (!isdigit(item.value.c_str())){
+        throw std::logic_error("expression syntax error");
+      }
       stack_of_operand.push(std::atof(item.value.c_str()));
     } else {
       if (item.value.size() == 1) {
@@ -191,10 +224,11 @@ double solve::ExpressionEvaluation::compute(const char* expression) {
             stack_of_operand.push(tan(degree_to_radian(rhs)));
             break;
           default:
+            throw std::logic_error("expression syntax error");
             break;
         }
       } else {
-        // 函数
+        throw std::logic_error("expression syntax error");
       }
     }
   }
