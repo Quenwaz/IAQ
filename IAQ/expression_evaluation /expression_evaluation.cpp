@@ -1,9 +1,10 @@
 #include "iaq/solve/expression_evaluation.hpp"
-
+#include "iaq/utility/utility.hpp"
 #include <cmath>
 #include <stack>
 #include <string>
 #include <vector>
+#include <map>
 #include <stdexcept>
 
 using namespace iaq;
@@ -20,29 +21,63 @@ struct ExpressionItem {
   bool is_operand;
 };
 
-bool isdigit(const char* string)
+
+class OperatorMgr
 {
-  for (;*string != '\0';++string)
-  {
-    if (!std::isdigit(*string)){
-      return false;
-    }
-  }
-  return true;
+public:
+  struct Item{
+    char short_name;
+    int priority;
+    enum OperatorType{
+      unary = 1,
+      binary,
+      ternary
+    }operator_type;
+
+    union FnOperator
+    {
+      double(*_1p)(double);
+      double(*_2p)(double,double);
+      FnOperator(decltype(_1p) _ty): _1p(_ty){}
+      FnOperator(decltype(_2p) _ty): _2p(_ty){}
+    }call;
+    
+    std::string full_name;
+  };
+private:
+  std::map<char, Item>  operators_;
+  static OperatorMgr* instance_;
+private:
+  OperatorMgr() = default;
+  ~OperatorMgr() = default;
+public:
+  static OperatorMgr* GetInstance();
+
+  void AddOperator(char short_name, const Item& item);
+
+};
+OperatorMgr* OperatorMgr::instance_ = nullptr;
+
+OperatorMgr* OperatorMgr::GetInstance()
+{
+  static OperatorMgr inst;
+  return &inst;
 }
 
-void replace_all(std::string& base, const std::string& src,
-                 const std::string& des) {
-  std::string::size_type len_of_src = src.size();
-  std::string::size_type len_of_des = des.size();
-  std::string::size_type pos = base.find(src);
-  while ((pos != std::string::npos)) {
-    base.replace(pos, len_of_src, des);
-    pos = base.find(src, (pos + len_of_des));
+void OperatorMgr::AddOperator(char short_name, const Item& item)
+{
+  if(!this->operators_.insert(std::make_pair(short_name, item)).second){
+    throw std::runtime_error("Operator already exists.");
   }
 }
+
+#define DECLARE_OPERATOR(short_name, full_name,operator_type,priority, fn)\
+OperatorMgr::GetInstance()->AddOperator(short_name,OperatorMgr::Item{short_name, priority,operator_type,fn,full_name});
+
+
 
 std::string replace_function_code(std::string& inputs) {
+
   std::vector<FnMaps> maps = {
       {'S', "sqrt"},
       {'s', "sin"},
@@ -53,11 +88,19 @@ std::string replace_function_code(std::string& inputs) {
   for (auto item : maps) {
     std::string code;
     code.push_back(item.code);
-    replace_all(inputs, item.function, code);
+    utility::replace_all(inputs, item.function, code);
   }
   return inputs;
 }
 
+/**
+ * @brief 中缀表达式切分
+ * 
+ * @param outputs [out] 返回中缀表达式列表
+ * @param inputs 输入中缀表达式字符串
+ * @param separator 切割的操作符
+ * @return size_t 被切分后的操作数与操作符个数
+ */
 size_t splice_string(std::vector<ExpressionItem>& outputs,
                      const std::string& inputs, const std::string& separator) {
   for (size_t pos = 0, pos_before = 0; pos != std::string::npos;
@@ -72,7 +115,7 @@ size_t splice_string(std::vector<ExpressionItem>& outputs,
   return outputs.size();
 }
 
-inline double degree_to_radian(double degree) { return degree * M_PI / 180; }
+
 
 int priority(const std::string& _operator) {
   if (_operator.size() == 1) {
@@ -94,6 +137,14 @@ int priority(const std::string& _operator) {
   return 0;
 }
 
+/**
+ * @brief 将切分后的中缀表达式转化为后缀表达式
+ * 
+ * @param exps 切分后的中缀表达式列表
+ * @param suffix_expression [out] 返回逆波兰式
+ * @return true 转换成功
+ * @return false 表达式存在语法错误
+ */
 bool convert_to_postfix_expression(
     const std::vector<ExpressionItem>& exps,
     std::vector<ExpressionItem>& suffix_expression) {
@@ -148,11 +199,11 @@ bool convert_to_postfix_expression(
 
 struct solve::ExpressionEvaluation::Impl {};
 
-double solve::ExpressionEvaluation::compute(const char* expression) {
-
+double solve::ExpressionEvaluation::operator()(const char* expression) const
+{
   std::string expstr(expression);
   // replace all spaces
-  replace_all(expstr, " ", "");
+  utility::replace_all(expstr, " ", "");
 
   // replace all function names with short names
   replace_function_code(expstr);
@@ -180,7 +231,7 @@ double solve::ExpressionEvaluation::compute(const char* expression) {
   std::stack<double> stack_of_operand;
   for (auto& item : suffix_exps) {
     if (item.is_operand) {
-      if (!isdigit(item.value.c_str())){
+      if (!utility::isdigit(item.value.c_str())){
         throw std::logic_error("expression syntax error");
       }
       stack_of_operand.push(std::atof(item.value.c_str()));
@@ -215,13 +266,13 @@ double solve::ExpressionEvaluation::compute(const char* expression) {
             stack_of_operand.push(sqrtf(rhs));
             break;
           case 's':
-            stack_of_operand.push(sin(degree_to_radian(rhs)));
+            stack_of_operand.push(sin(utility::degree_to_radian(rhs)));
             break;
           case 'c':
-            stack_of_operand.push(cos(degree_to_radian(rhs)));
+            stack_of_operand.push(cos(utility::degree_to_radian(rhs)));
             break;
           case 't':
-            stack_of_operand.push(tan(degree_to_radian(rhs)));
+            stack_of_operand.push(tan(utility::degree_to_radian(rhs)));
             break;
           default:
             throw std::logic_error("expression syntax error");

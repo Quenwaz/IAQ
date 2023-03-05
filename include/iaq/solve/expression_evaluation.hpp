@@ -27,7 +27,7 @@ struct ExpressionEvaluation : public iaq::AlgBase
         return iaq::Version::V1;
     }
 
-    double compute(const char* expression);
+    double operator()(const char* expression) const;
 
 private:
     struct Impl;

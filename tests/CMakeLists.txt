@@ -13,7 +13,7 @@ function(iaq_test test_name)
     endif ()
     # 由于gtest是由GCC5.1之前版本编译的， 而被测试的程序是由更高版本编译器编译， 
     # 所以如果需要LIBCXX_USE_CXX11_ABI=0来兼容旧版本libstdc++，否则LIBCXX_USE_CXX11_ABI=1则链接新版本libstdc++
-    target_compile_definitions(${TEST_EXECUTABLE} PRIVATE _GLIBCXX_USE_CXX11_ABI=1)
+    target_compile_definitions(${TEST_EXECUTABLE} PRIVATE _GLIBCXX_USE_CXX11_ABI=0)
     add_test(${test_name} ${TEST_EXECUTABLE})
 endfunction()
 
