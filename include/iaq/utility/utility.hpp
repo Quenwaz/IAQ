@@ -1,7 +1,6 @@
 #include <string>
 #include <cmath>
 
-
 namespace iaq::utility
 {
 /**
@@ -11,16 +10,7 @@ namespace iaq::utility
  * @return true 都为数字
  * @return false 存在不为数字的字符
  */
-bool isdigit(const char* string)
-{
-  for (;*string != '\0';++string)
-  {
-    if (!std::isdigit(*string)){
-      return false;
-    }
-  }
-  return true;
-}
+bool isdigit(const char* string);
 
 /**
  * @brief 在源字符串中找到指定字符串并替换
@@ -30,17 +20,7 @@ bool isdigit(const char* string)
  * @param newstr 新字符串
  */
 std::string& replace_all(std::string& base, const std::string& oldstr,
-                 const std::string& newstr) {
-  std::string::size_type len_of_src = oldstr.size();
-  std::string::size_type len_of_des = newstr.size();
-  std::string::size_type pos = base.find(oldstr);
-  while ((pos != std::string::npos)) {
-    base.replace(pos, len_of_src, newstr);
-    pos = base.find(oldstr, (pos + len_of_des));
-  }
-
-  return base;
-}
+                 const std::string& newstr);
 
 /**
  * @brief 角度转弧度:1°=PI/180弧度

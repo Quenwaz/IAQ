@@ -29,9 +29,6 @@ struct ExpressionEvaluation : public iaq::AlgBase
 
     double operator()(const char* expression) const;
 
-private:
-    struct Impl;
-    Impl * impl_;
 };
     
 }

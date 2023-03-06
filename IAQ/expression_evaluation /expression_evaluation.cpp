@@ -1,11 +1,14 @@
 #include "iaq/solve/expression_evaluation.hpp"
-#include "iaq/utility/utility.hpp"
+
 #include <cmath>
+#include <functional>
+#include <map>
 #include <stack>
+#include <stdexcept>
 #include <string>
 #include <vector>
-#include <map>
-#include <stdexcept>
+
+#include "iaq/utility/utility.hpp"
 
 using namespace iaq;
 
@@ -21,93 +24,139 @@ struct ExpressionItem {
   bool is_operand;
 };
 
+#define DECLARE_OPERATOR(short_name, full_name, priority, fn) \
+  extern double operator_##fn(const std::vector<double>&);
+#include "operator_define.hpp"
+#undef DECLARE_OPERATOR
 
-class OperatorMgr
-{
-public:
-  struct Item{
-    char short_name;
-    int priority;
-    enum OperatorType{
-      unary = 1,
-      binary,
-      ternary
-    }operator_type;
-
-    union FnOperator
-    {
-      double(*_1p)(double);
-      double(*_2p)(double,double);
-      FnOperator(decltype(_1p) _ty): _1p(_ty){}
-      FnOperator(decltype(_2p) _ty): _2p(_ty){}
-    }call;
-    
-    std::string full_name;
+class OperatorMgr {
+  enum OperatorPriority {
+    kPriorityMin = 0,
+#define DECLARE_OPERATOR(short_name, full_name, priority, fn) kPriority_##fn,
+#include "operator_define.hpp"
+    kPriorityMax
   };
-private:
-  std::map<char, Item>  operators_;
+#undef DECLARE_OPERATOR
+
+ private:
+  std::string all_operator_string_;
   static OperatorMgr* instance_;
-private:
-  OperatorMgr() = default;
+
+ private:
+  OperatorMgr();
   ~OperatorMgr() = default;
-public:
+
+  /**
+   * @brief 获取所有操作符组成的字符串
+   *
+   */
+  const std::string get_all_operator() const { return all_operator_string_; }
+
+  /**
+   * @brief 获取指定操作符的优先级
+   *
+   * @param ch 操作符
+   * @return int 优先级
+   */
+  int get_priority(char ch);
+
+  /**
+   * @brief 替换表达式中函数全称为内置的简称
+   *
+   * @param expression 表达式
+   */
+  void replace_function_to_operator(std::string& expression);
+
+  /**
+   * @brief 中缀表达式切分
+   *
+   * @param outputs [out] 返回中缀表达式列表
+   * @param inputs 输入中缀表达式字符串
+   * @param separator 切割的操作符
+   * @return size_t 被切分后的操作数与操作符个数
+   */
+  size_t splice_string(std::vector<ExpressionItem>& outputs,
+                       const std::string& inputs, const std::string& separator);
+
+  /**
+   * @brief 将切分后的中缀表达式转化为后缀表达式
+   *
+   * @param exps 切分后的中缀表达式列表
+   * @param suffix_expression [out] 返回逆波兰式
+   * @return true 转换成功
+   * @return false 表达式存在语法错误
+   */
+  bool convert_to_postfix_expression(
+      const std::vector<ExpressionItem>& exps,
+      std::vector<ExpressionItem>& suffix_expression);
+
+  /**
+   * @brief 根据指定运算符进行运算
+   *
+   * @param ch 运算符
+   * @param args 参数，目前最大支持2个参数，其顺序为 [右操作数,左操作数]
+   * @return double 返回运算结果
+   */
+  double compute(char ch, const std::vector<double>& args);
+
+ public:
   static OperatorMgr* GetInstance();
 
-  void AddOperator(char short_name, const Item& item);
-
+  /**
+   * @brief 计算字符串表达式的值
+   *
+   * @param expression 字符串表达式
+   * @return double 返回计算的值
+   */
+  double compute(const std::string& expression);
 };
+
 OperatorMgr* OperatorMgr::instance_ = nullptr;
 
-OperatorMgr* OperatorMgr::GetInstance()
-{
+OperatorMgr::OperatorMgr() : all_operator_string_("()") {
+#define DECLARE_OPERATOR(short_name, full_name, priority, fn) \
+  all_operator_string_.push_back(short_name);
+#include "operator_define.hpp"
+#undef DECLARE_OPERATOR
+}
+
+OperatorMgr* OperatorMgr::GetInstance() {
   static OperatorMgr inst;
   return &inst;
 }
 
-void OperatorMgr::AddOperator(char short_name, const Item& item)
-{
-  if(!this->operators_.insert(std::make_pair(short_name, item)).second){
-    throw std::runtime_error("Operator already exists.");
+int OperatorMgr::get_priority(char ch) {
+  switch (ch) {
+    case ')':
+      return OperatorPriority::kPriorityMin;
+    case '(':
+      return OperatorPriority::kPriorityMax;
+#define DECLARE_OPERATOR(short_name, full_name, priority, fn) \
+  case short_name:                                            \
+    return priority;
+#include "operator_define.hpp"
+    default:
+      throw std::logic_error("Operator does not exist");
+      break;
   }
+#undef DECLARE_OPERATOR
 }
 
-#define DECLARE_OPERATOR(short_name, full_name,operator_type,priority, fn)\
-OperatorMgr::GetInstance()->AddOperator(short_name,OperatorMgr::Item{short_name, priority,operator_type,fn,full_name});
-
-
-
-std::string replace_function_code(std::string& inputs) {
-
-  std::vector<FnMaps> maps = {
-      {'S', "sqrt"},
-      {'s', "sin"},
-      {'c', "cos"},
-      {'t', "tan"},
-  };
-
-  for (auto item : maps) {
-    std::string code;
-    code.push_back(item.code);
-    utility::replace_all(inputs, item.function, code);
-  }
-  return inputs;
+void OperatorMgr::replace_function_to_operator(std::string& expression) {
+#define DECLARE_OPERATOR(short_name, full_name, priority, fn) \
+  utility::replace_all(expression, full_name, std::string(1, short_name));
+#include "operator_define.hpp"
+#undef DECLARE_OPERATOR
 }
 
-/**
- * @brief 中缀表达式切分
- * 
- * @param outputs [out] 返回中缀表达式列表
- * @param inputs 输入中缀表达式字符串
- * @param separator 切割的操作符
- * @return size_t 被切分后的操作数与操作符个数
- */
-size_t splice_string(std::vector<ExpressionItem>& outputs,
-                     const std::string& inputs, const std::string& separator) {
+size_t OperatorMgr::splice_string(std::vector<ExpressionItem>& outputs,
+                                  const std::string& inputs,
+                                  const std::string& separator) {
   for (size_t pos = 0, pos_before = 0; pos != std::string::npos;
        pos_before = pos + 1) {
     pos = inputs.find_first_of(separator, pos_before);
     std::string __tmp = inputs.substr(pos_before, pos - pos_before);
-    
+
     if (!__tmp.empty()) outputs.push_back(ExpressionItem({__tmp, true}));
     if (pos != std::string::npos)
       outputs.push_back(ExpressionItem({inputs.substr(pos, 1), false}));
@@ -115,37 +164,7 @@ size_t splice_string(std::vector<ExpressionItem>& outputs,
   return outputs.size();
 }
 
-
-
-int priority(const std::string& _operator) {
-  if (_operator.size() == 1) {
-    char oper = _operator.front();
-    switch (oper) {
-      case ')':
-        return 0;
-      case '+': case '-':
-        return 1;
-      case '*': case '/': case '^': case 'S':
-      case 's': case 'c': case 't':
-        return 2;
-      case '(':
-        return 3;
-      default:
-        break;
-    }
-  }
-  return 0;
-}
-
-/**
- * @brief 将切分后的中缀表达式转化为后缀表达式
- * 
- * @param exps 切分后的中缀表达式列表
- * @param suffix_expression [out] 返回逆波兰式
- * @return true 转换成功
- * @return false 表达式存在语法错误
- */
-bool convert_to_postfix_expression(
+bool OperatorMgr::convert_to_postfix_expression(
     const std::vector<ExpressionItem>& exps,
     std::vector<ExpressionItem>& suffix_expression) {
   std::stack<ExpressionItem> stack_of_operator;
@@ -159,20 +178,25 @@ bool convert_to_postfix_expression(
         stack_of_operator.push(exp);
       } else {
         if (exp.value == ")") {
-          while (!stack_of_operator.empty() && stack_of_operator.top().value != "(") {
+          while (!stack_of_operator.empty() &&
+                 stack_of_operator.top().value != "(") {
             suffix_expression.push_back(stack_of_operator.top());
             stack_of_operator.pop();
           }
-          if (stack_of_operator.empty() || stack_of_operator.top().value != "("){
+          if (stack_of_operator.empty() ||
+              stack_of_operator.top().value != "(") {
             return false;
           }
           stack_of_operator.pop();
 
         } else {
-          const int current_priority = priority(exp.value);
+          const int current_priority =
+              OperatorMgr::GetInstance()->get_priority(exp.value.front());
           while (!stack_of_operator.empty()) {
             const auto top = stack_of_operator.top();
-            if (priority(top.value) >= current_priority && top.value != "(") {
+            if (OperatorMgr::GetInstance()->get_priority(top.value.front()) >=
+                    current_priority &&
+                top.value != "(") {
               suffix_expression.push_back(top);
               stack_of_operator.pop();
             } else {
@@ -186,8 +210,8 @@ bool convert_to_postfix_expression(
   }
 
   while (!stack_of_operator.empty()) {
-    auto & item = stack_of_operator.top();
-    if (item.value == "(" || item.value == ")"){
+    auto& item = stack_of_operator.top();
+    if (item.value == "(" || item.value == ")") {
       return false;
     }
     suffix_expression.push_back(stack_of_operator.top());
@@ -197,91 +221,78 @@ bool convert_to_postfix_expression(
   return true;
 }
 
-struct solve::ExpressionEvaluation::Impl {};
+double OperatorMgr::compute(char ch, const std::vector<double>& args) {
+  switch (ch) {
+#define DECLARE_OPERATOR(short_name, full_name, priority, fn) \
+  case short_name:                                            \
+    return operator_##fn(args);
+#include "operator_define.hpp"
+    default:
+      throw std::logic_error("Operator does not exist");
+      break;
+  }
+#undef DECLARE_OPERATOR
+}
 
-double solve::ExpressionEvaluation::operator()(const char* expression) const
-{
+double OperatorMgr::compute(const std::string& expression) {
   std::string expstr(expression);
   // replace all spaces
   utility::replace_all(expstr, " ", "");
 
   // replace all function names with short names
-  replace_function_code(expstr);
+  OperatorMgr::GetInstance()->replace_function_to_operator(expstr);
 
   // separates operands from operators
   std::vector<ExpressionItem> exps;
-  splice_string(exps, expstr, "+-*/()^Ssct");
+  splice_string(exps, expstr, OperatorMgr::GetInstance()->get_all_operator());
 
   // converts an infix expression to a postfix expression
   std::vector<ExpressionItem> suffix_exps;
-  if (exps.size() < 2 || !convert_to_postfix_expression(exps, suffix_exps)){
+  if (exps.size() < 2 || !convert_to_postfix_expression(exps, suffix_exps)) {
     throw std::logic_error("expression syntax error");
   }
 
 #ifdef _DEBUG
   expstr.clear();
-  for (auto& item : suffix_exps)
-  {
-    // printf("[%s]",item.value.c_str());
-    // fflush(stdout);
+  printf("\n");
+  fflush(stdout);
+  for (auto& item : suffix_exps) {
+    printf("[%s]", item.value.c_str());
+    fflush(stdout);
     expstr += item.value;
   }
-#endif 
+#endif
 
   std::stack<double> stack_of_operand;
   for (auto& item : suffix_exps) {
     if (item.is_operand) {
-      if (!utility::isdigit(item.value.c_str())){
+      if (!utility::isdigit(item.value.c_str())) {
         throw std::logic_error("expression syntax error");
       }
       stack_of_operand.push(std::atof(item.value.c_str()));
     } else {
       if (item.value.size() == 1) {
-        double rhs = stack_of_operand.top();
+        std::vector<double> args;
+        // 先出栈的为右操作符
+        args.push_back(stack_of_operand.top());
         stack_of_operand.pop();
-        double lhs = 0;
+        // 只有非字母才为二元操作
         if (!std::isalpha(item.value.front())) {
-          lhs = stack_of_operand.top();
+          // 后出栈的为左操作符
+          args.push_back(stack_of_operand.top());
           stack_of_operand.pop();
         }
+        stack_of_operand.push(
+            OperatorMgr::GetInstance()->compute(item.value.front(), args));
 
-        // 四则运算
-        switch (item.value.front()) {
-          case '+':
-            stack_of_operand.push(lhs + rhs);
-            break;
-          case '-':
-            stack_of_operand.push(lhs - rhs);
-            break;
-          case '*':
-            stack_of_operand.push(lhs * rhs);
-            break;
-          case '/':
-            stack_of_operand.push(lhs / rhs);
-            break;
-          case '^':
-            stack_of_operand.push(powf(lhs, rhs));
-            break;
-          case 'S':
-            stack_of_operand.push(sqrtf(rhs));
-            break;
-          case 's':
-            stack_of_operand.push(sin(utility::degree_to_radian(rhs)));
-            break;
-          case 'c':
-            stack_of_operand.push(cos(utility::degree_to_radian(rhs)));
-            break;
-          case 't':
-            stack_of_operand.push(tan(utility::degree_to_radian(rhs)));
-            break;
-          default:
-            throw std::logic_error("expression syntax error");
-            break;
-        }
       } else {
         throw std::logic_error("expression syntax error");
       }
     }
   }
   return stack_of_operand.top();
+}
+
+double solve::ExpressionEvaluation::operator()(const char* expression) const {
+  return OperatorMgr::GetInstance()->compute(expression);
 }
