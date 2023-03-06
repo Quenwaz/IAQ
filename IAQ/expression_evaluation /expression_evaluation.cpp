@@ -252,17 +252,6 @@ double OperatorMgr::compute(const std::string& expression) {
     throw std::logic_error("expression syntax error");
   }
 
-#ifdef _DEBUG
-  expstr.clear();
-  printf("\n");
-  fflush(stdout);
-  for (auto& item : suffix_exps) {
-    printf("[%s]", item.value.c_str());
-    fflush(stdout);
-    expstr += item.value;
-  }
-#endif
-
   std::stack<double> stack_of_operand;
   for (auto& item : suffix_exps) {
     if (item.is_operand) {
@@ -271,23 +260,18 @@ double OperatorMgr::compute(const std::string& expression) {
       }
       stack_of_operand.push(std::atof(item.value.c_str()));
     } else {
-      if (item.value.size() == 1) {
-        std::vector<double> args;
-        // 先出栈的为右操作符
+      std::vector<double> args;
+      //  pop first is the right operator 
+      args.push_back(stack_of_operand.top());
+      stack_of_operand.pop();
+      //  Only non-letters are binary operations 
+      if (!std::isalpha(item.value.front())) {
+        //  pop second is the left operator
         args.push_back(stack_of_operand.top());
         stack_of_operand.pop();
-        // 只有非字母才为二元操作
-        if (!std::isalpha(item.value.front())) {
-          // 后出栈的为左操作符
-          args.push_back(stack_of_operand.top());
-          stack_of_operand.pop();
-        }
-        stack_of_operand.push(
-            OperatorMgr::GetInstance()->compute(item.value.front(), args));
-
-      } else {
-        throw std::logic_error("expression syntax error");
       }
+      stack_of_operand.push(
+          OperatorMgr::GetInstance()->compute(item.value.front(), args));
     }
   }
   return stack_of_operand.top();
