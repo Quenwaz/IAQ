@@ -10,6 +10,7 @@ TEST(test_expression_evaluation, positive)
     ASSERT_EQ(exp_eval("12+ 2*3-6/2+sqrt(3^2)"), 18);
     ASSERT_EQ(exp_eval("9+(3-1)*3+8/2"), 19);
     ASSERT_EQ(exp_eval("5+6*2"), 17);
+    ASSERT_EQ(exp_eval("myfunction(1,2,3)"), 6);
 }
 
 TEST(test_expression_evaluation, negative)

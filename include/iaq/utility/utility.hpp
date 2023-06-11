@@ -1,5 +1,6 @@
 #include <string>
 #include <cmath>
+#include <vector>
 
 namespace iaq::utility
 {
@@ -21,6 +22,19 @@ bool isdigit(const char* string);
  */
 std::string& replace_all(std::string& base, const std::string& oldstr,
                  const std::string& newstr);
+
+
+/**
+ * @brief 字符串切割
+ * 
+ * @param outputs 输出切割后的字符串列表
+ * @param inputs 输入字符串
+ * @param separator 切割符， 如,.表示切割有,及.分割的字符串
+ * @return size_t 
+ */
+size_t splice_string(std::vector<std::string>& outputs,
+                    const std::string& inputs,
+                    const std::string& separator);
 
 /**
  * @brief 角度转弧度:1°=PI/180弧度

@@ -48,3 +48,9 @@ double operator_tan(const std::vector<double>& args)
 {
   return tan(utility::degree_to_radian(args.at(0)));
 }
+
+
+double operator_myfunction(const std::vector<double>& args)
+{
+  return args.at(2) + args.at(1) + args.at(0);
+}

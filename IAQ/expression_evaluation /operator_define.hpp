@@ -14,6 +14,7 @@ DECLARE_OPERATOR('S',"sqrt",2,sqrt)
 DECLARE_OPERATOR('s',"sin",2,sin)
 DECLARE_OPERATOR('c',"cos",2,cos)
 DECLARE_OPERATOR('t',"tan",2,tan)
+DECLARE_OPERATOR('m',"myfunction",2,myfunction)
 
 #ifdef DO_UNDEF_DECLARE_OPERATOR
 #undef DECLARE_OPERATOR

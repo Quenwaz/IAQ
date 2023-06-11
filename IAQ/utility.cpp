@@ -30,4 +30,20 @@ std::string& iaq::utility::replace_all(std::string& base, const std::string& old
   return base;
 }
 
+size_t iaq::utility::splice_string(std::vector<std::string>& outputs,
+                                  const std::string& inputs,
+                                  const std::string& separator) {
+  for (size_t pos = 0, pos_before = 0; pos != std::string::npos;
+       pos_before = pos + 1) {
+    pos = inputs.find_first_of(separator, pos_before);
+    std::string __tmp = inputs.substr(pos_before, pos - pos_before);
+
+    if (!__tmp.empty()) outputs.push_back(__tmp);
+  }
+  return outputs.size();
+}
+
+
+
+
 

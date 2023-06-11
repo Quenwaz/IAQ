@@ -253,17 +253,30 @@ double OperatorMgr::compute(const std::string& expression) {
   }
 
   std::stack<double> stack_of_operand;
+  size_t remaind_argument_size = 0;
   for (auto& item : suffix_exps) {
     if (item.is_operand) {
-      if (!utility::isdigit(item.value.c_str())) {
-        throw std::logic_error("expression syntax error");
+      std::vector<std::string> operands;
+      utility::splice_string(operands,item.value, ",");
+      if (operands.size() > 1){
+        remaind_argument_size += operands.size() -1;
       }
-      stack_of_operand.push(std::atof(item.value.c_str()));
+      
+      for(auto operand: operands){
+        if (!utility::isdigit(operand.c_str())) {
+          throw std::logic_error("expression syntax error");
+        }
+        stack_of_operand.push(std::atof(operand.c_str()));
+      }
     } else {
       std::vector<double> args;
       //  pop first is the right operator 
       args.push_back(stack_of_operand.top());
       stack_of_operand.pop();
+      for (size_t i = 0; i < remaind_argument_size; ++i){
+          args.push_back(stack_of_operand.top());
+          stack_of_operand.pop();
+      }
       //  Only non-letters are binary operations 
       if (!std::isalpha(item.value.front())) {
         //  pop second is the left operator
@@ -272,6 +285,8 @@ double OperatorMgr::compute(const std::string& expression) {
       }
       stack_of_operand.push(
           OperatorMgr::GetInstance()->compute(item.value.front(), args));
+        
+      remaind_argument_size = 0;
     }
   }
   return stack_of_operand.top();
