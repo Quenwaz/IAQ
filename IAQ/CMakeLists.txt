@@ -1,4 +1,4 @@
-﻿file(GLOB_RECURSE SOURCES "*.cpp")
+﻿file(GLOB_RECURSE SOURCES *.cpp *.cc)
 file (GLOB_RECURSE INCLUDE_FILES "${PROJECT_SOURCE_DIR}/include/iaq/*.hpp" "${PROJECT_SOURCE_DIR}/include/utility/*.hpp")
 message(STATUS "INCLUDE_FILES=${INCLUDE_FILES}")
 set(SOURCE_FILES ${SOURCES}  ${INCLUDE_FILES})
