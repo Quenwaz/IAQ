@@ -5,6 +5,7 @@
 TEST(test_expression_evaluation, positive)
 {
     iaq::solve::ExpressionEvaluation exp_eval;
+    ASSERT_DOUBLE_EQ(exp_eval("2.5*4"), 10);
     ASSERT_DOUBLE_EQ(exp_eval("33*3 + sin(90)"), 100);
     ASSERT_NEAR(exp_eval("100 + 2 * (25*4+cos(90))"), 300, 3);
     ASSERT_EQ(exp_eval("12+ 2*3-6/2+sqrt(3^2)"), 18);

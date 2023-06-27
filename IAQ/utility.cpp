@@ -6,7 +6,7 @@ bool iaq::utility::isdigit(const char* string)
 {
   for (;*string != '\0';++string)
   {
-    if (!std::isdigit(*string)){
+    if (!std::isdigit(*string) && (*string) != '.'){
       return false;
     }
   }
