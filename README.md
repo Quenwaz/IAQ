@@ -9,6 +9,8 @@
 - [x] Base64转换
 - [x] Unicode转换
 - [x] 字节对齐
+- [x] 表达式求值
+- [x] LRU缓存算法
 
 # 目录
 - [IAQ](#iaq)
@@ -27,9 +29,11 @@
 5. [Base64转换](IAQ/base64/README.md)
 6. [Unicode转换](IAQ/unicode/README.md)
 7. [字节对齐](IAQ/byte_alignment/README.md)
+8. [表达式求值](IAQ/expression_evaluation/README.md)
+9. [LRU缓存算法](IAQ/lru_cache/README.md)
 
 
 # 待解决问题
 - [ ] URL Encode
-- [ ] 表达式求值
+
 

@@ -94,8 +94,7 @@ namespace __method{
 
 intptr_t iaq::solve::CheckCode::operator()(Method method, const char* _data, char* _validate) const
 {
-    auto t1 = 8_I2B;
-    auto t2 = 1001_B2I;
+
     std::string data(_data);
     std::string validate(_validate==nullptr? "": _validate);
     switch (method)
