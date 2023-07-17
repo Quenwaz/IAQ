@@ -11,6 +11,8 @@
 - [x] 字节对齐
 - [x] 表达式求值
 - [x] LRU缓存算法
+- [x] 顺序单链表去重
+
 
 # 目录
 - [IAQ](#iaq)
@@ -31,9 +33,9 @@
 7. [字节对齐](IAQ/byte_alignment/README.md)
 8. [表达式求值](IAQ/expression_evaluation/README.md)
 9. [LRU缓存算法](IAQ/lru_cache/README.md)
+10. [顺序单链表去重](IAQ/ordered_single_link_deduplication/README.md)
 
 
 # 待解决问题
 - [ ] URL Encode
-
 

@@ -59,7 +59,8 @@
         "thread": "cpp",
         "condition_variable": "cpp",
         "mutex": "cpp",
-        "bitset": "cpp"
+        "bitset": "cpp",
+        "queue": "cpp"
     },
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
 }

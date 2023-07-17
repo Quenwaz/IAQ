@@ -1,7 +1,8 @@
 ﻿
-function(iaq_test test_name)
+function(iaq_test test_filename)
+    STRING(REGEX REPLACE "(.*)(\.cpp|\.cc)" "\\1" test_name ${test_filename})
     set(TEST_EXECUTABLE run_${test_name})
-    set(TEST_SOURCE ${test_name}.cpp)
+    set(TEST_SOURCE ${test_filename})
 
     add_executable(${TEST_EXECUTABLE} ${TEST_SOURCE})
     target_include_directories(${TEST_EXECUTABLE} PRIVATE ${PROJECT_SOURCE_DIR}/include)
@@ -21,12 +22,12 @@ endfunction()
 
 
 macro(subdirlist result curdir)
-    file(GLOB children RELATIVE ${curdir} ${curdir}/*.cpp)
+    file(GLOB children RELATIVE ${curdir} ${curdir}/*.cpp ${curdir}/*.cc)
     set(dirlist "")
     foreach(child ${children})
         if(NOT IS_DIRECTORY ${curdir}/${child})
-            STRING(REGEX REPLACE "(.*)\.cpp" "\\1" FILE_NAME ${child})
-            list(APPEND dirlist ${FILE_NAME})
+            # STRING(REGEX REPLACE "(.*)\.cpp|.cc" "\\1" FILE_NAME ${child})
+            list(APPEND dirlist ${child})
         endif()
     endforeach(child ${children})
     set(${result} ${dirlist})
